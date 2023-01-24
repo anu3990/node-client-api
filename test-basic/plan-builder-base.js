@@ -70,6 +70,7 @@ function getResults(response) {
   if (rows === void 0) {
     return response;
   }
+  console.log('returning rows')
   return rows;
 }
 function getResult(response) {
