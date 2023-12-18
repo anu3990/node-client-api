@@ -21,10 +21,21 @@ const marklogic = require('../');
 const p = marklogic.planBuilder;
 
 const pbb = require('./plan-builder-base');
+const testlib = require("../etc/test-lib");
 const execPlan = pbb.execPlan;
 const getResults = pbb.getResults;
+let serverConfiguration = {};
 
 describe('search', function() {
+  before(function (done) {
+    this.timeout(6000);
+    try {
+      testlib.findServerConfiguration(serverConfiguration);
+      setTimeout(()=>{done();}, 3000);
+    } catch(error){
+      done(error);
+    }
+  });
   describe('accessors', function() {
     it('basic', function(done) {
       execPlan(
@@ -101,7 +112,7 @@ describe('search', function() {
     it('columns', function(done) {
       execPlan(
           p.fromSearch(p.cts.jsonPropertyValueQuery('instrument', 'trumpet'),
-                  ['score', 'quality'], null, {scoreMethod:'simple', qualityWeight:0})
+                  ['score', 'quality'], null, {scoreMethod:'score-bm25', qualityWeight:0})
       ).then(function(response) {
         const output = getResults(response);
         should(output.length).equal(2);
@@ -168,6 +179,24 @@ describe('search', function() {
         done();
       }).catch(done);
     });
-// console.log(JSON.stringify(output, null, 2));
+
+    it('should search docs with scoreMethod as score-bm25', function(done) {
+      console.log(serverConfiguration.serverVersion)
+      if(serverConfiguration.serverVersion < 12){
+        this.skip();
+      }
+      execPlan(
+          p.fromSearch(p.cts.jsonPropertyValueQuery('instrument', 'trumpet'),
+              ['score', 'quality'], null, {scoreMethod:'score-bm25', qualityWeight:0})
+      ).then(function(response) {
+        const output = getResults(response);
+        should(output.length).equal(2);
+        should(output[0].score.value).greaterThan(0);
+        should(output[0].quality.value).greaterThanOrEqual(0);
+        should(output[1].score.value).greaterThan(0);
+        should(output[1].quality.value).greaterThanOrEqual(0);
+        done();
+      }).catch(done);
+    });
   });
 });
