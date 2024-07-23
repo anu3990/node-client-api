@@ -953,7 +953,7 @@ describe('plan builder', function() {
     it('geo.geohashNeighbors#1', function(done) {
         testPlan([p.xs.string("s01mtw")], p.geo.geohashNeighbors(p.col("1")))
           .then(function(response) { 
-            should(getResult(response).value).eql({"NE":"s01mtz", "S":"s01mtt", "E":"s01mty", "W":"s01mtq", "N":"s01mtx", "SW":"s01mtm", "SE":"s01mtv", "NW":"s01mtr"});
+            should(getResult(response).value).eql({"NE":"s01mtz", "S":"s01mtt", "E":"s01mty", "W":"s01mtq", "SW":"s01mtm", "N":"s01mtx", "SE":"s01mtv", "NW":"s01mtr"});
             done();
         }).catch(done);
     }); 
