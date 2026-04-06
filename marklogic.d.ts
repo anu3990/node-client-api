@@ -215,6 +215,48 @@ declare module 'marklogic' {
     systemTime?: string;
   }
 
+
+  /**
+   * A single database item returned by the databases.list() method.
+   * Represents a database entry from the MarkLogic Manage API.
+   * @since 3.3.0
+   */
+  export interface DatabaseListItem {
+    /** The name of the database */
+    nameref: string;
+    /** The URI reference for the database in the Manage API */
+    uriref: string;
+    /** The unique identifier of the database */
+    idref: string;
+  }
+
+  /**
+   * Provides functions to retrieve information about MarkLogic databases
+   * via the Manage API (/manage/v2/databases). The client must have been
+   * created for a user with the manage-admin or admin role, typically
+   * connecting to the manage port (8002).
+   * @since 3.3.0
+   */
+  export interface DatabasesInterface {
+    /**
+     * Lists the databases on the MarkLogic server.
+     * Calls GET /manage/v2/databases?format=json and transforms the
+     * response into an array of DatabaseListItem objects.
+     * @since 3.3.0
+     * @returns A ResultProvider that resolves to an array of DatabaseListItem
+     */
+    list(): ResultProvider<DatabaseListItem[]>;
+
+    /**
+     * Reads the details of a specific database by name or id.
+     * Calls GET /manage/v2/databases/{databaseId}?format=json.
+     * @since 3.3.0
+     * @param databaseId - the name or numeric id of the database
+     * @returns A ResultProvider that resolves to the database detail object
+     */
+    read(databaseId: string): ResultProvider<any>;
+  }
+
   /**
    * Documents interface for reading and writing documents.
    */
@@ -404,6 +446,14 @@ declare module 'marklogic' {
      * @since 1.0
      */
     documents: Documents;
+
+    /**
+     * Databases interface for listing and reading MarkLogic databases.
+     * Requires a client connected to the Manage API (typically port 8002)
+     * with manage-admin or admin privileges.
+     * @since 3.3.0
+     */
+    databases: DatabasesInterface;
 
     /**
      * Tests if a connection is successful.
